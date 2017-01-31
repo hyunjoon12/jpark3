@@ -30,7 +30,7 @@ library(DescTools)
 
 setwd('C:/Users/hup11/desktop/Rworking')
 citi <- read.csv('cities_data_set.csv', header= TRUE)
-lm1 <- lm(CRIME ~ ï..SIZE + POV, data = citi)
+lm1 <- lm(CRIME ~ Ã¯..SIZE + POV, data = citi)
 summary(lm1)
 anova(lm1)
 EtaSq(lm1)
@@ -60,8 +60,8 @@ H0: beta3 = 0,
 PA= 4, PC = 3, PA - PC = 1, N - PA = 171
 
 ```{r}
-ï..SIZExPOV <- citi$POV * citi$ï..SIZE
-lm2 <- lm(CRIME ~ ï..SIZE + POV + ï..SIZExPOV , data = citi )
+Ã¯..SIZExPOV <- citi$POV * citi$Ã¯..SIZE
+lm2 <- lm(CRIME ~ Ã¯..SIZE + POV + Ã¯..SIZExPOV , data = citi )
 anova(lm2)
 summary(lm2)
 EtaSq(lm2)
@@ -86,14 +86,14 @@ c.	Create a plot that shows the relation between city size and crime for low and
 
 ```{r}
 library(psych)
-describe(citi$ï..SIZE)
+describe(citi$Ã¯..SIZE)
 describe(citi$POV)
 
-ï..SIZE_mean <- citi$ï..SIZE - 38.42
+Ã¯..SIZE_mean <- citi$Ã¯..SIZE - 38.42
 POV_mean <- citi$POV - 22.54
-ï..SIZE_meanXPOV_mean <- ï..SIZE_mean * POV_mean
+Ã¯..SIZE_meanXPOV_mean <- Ã¯..SIZE_mean * POV_mean
 
-lm3 <- lm(citi$CRIME ~ ï..SIZE_mean + POV_mean + ï..SIZE_meanXPOV_mean)
+lm3 <- lm(citi$CRIME ~ Ã¯..SIZE_mean + POV_mean + Ã¯..SIZE_meanXPOV_mean)
 summary(lm3)
 anova(lm3)
 
@@ -117,7 +117,7 @@ Plotting in R
 
 ```{r}
 
-citi <- cbind(citi,ï..SIZExPOV, ï..SIZE_mean, POV_mean, ï..SIZE_meanXPOV_mean)
+citi <- cbind(citi,Ã¯..SIZExPOV, Ã¯..SIZE_mean, POV_mean, Ã¯..SIZE_meanXPOV_mean)
 
 plot(CRIME~POV_mean, data=citi, col="gray", xlab="Poverty Rate", cex.lab=1.5, 
      ylab="Crime incidents", cex.lab=1.5, cex=.5, xlim=c(-20, 30), ylim=c(0, 260))
@@ -137,11 +137,12 @@ I mean deviated for plotting graph in quesiton c.
 ```{r}
 
 
-lm3 <- lm(citi$CRIME ~ ï..SIZE_mean + POV_mean + ï..SIZE_meanXPOV_mean)
+lm3 <- lm(citi$CRIME ~ Ã¯..SIZE_mean + POV_mean + Ã¯..SIZE_meanXPOV_mean)
 summary(lm3)
 anova(lm3)
 EtaSq(lm3)
-
+summary(lm1)
+summary(lm2)
 
 ```
 
@@ -157,13 +158,13 @@ The analysis shows there is no change in the co-effiecient for the interaction.
 e.	Your friend Sam is particularly interested in the relation between POV and CRIME for cities with a population of 500,000.  To provide an answer, test the simple relation between POV and CRIME in cities where SIZE equals 50 (500,000 inhabitants).  To do this, you will need to deviate SIZE, so that 50 = 0 and then re-compute the product.  To answer the specific question posed here, it doesn't matter if or how poverty is centered (you might try it a couple of ways to see).  No need to report models A and C.  Write a conclusion about the simple relationship between POV and CRIME for cites with half a million residents.
 
 ```{r}
-ï..SIZE_50 <- citi$ï..SIZE -50
-citi <- cbind(citi,ï..SIZE_50 )
-ï..SIZE_50xPOV_mean <- ï..SIZE_50 * POV_mean
-citi <- cbind(citi,ï..SIZE_50xPOV_mean)
+Ã¯..SIZE_50 <- citi$Ã¯..SIZE -50
+citi <- cbind(citi,Ã¯..SIZE_50 )
+Ã¯..SIZE_50xPOV_mean <- Ã¯..SIZE_50 * POV_mean
+citi <- cbind(citi,Ã¯..SIZE_50xPOV_mean)
 
 
-lm4 <- lm(CRIME ~ ï..SIZE_50 + POV_mean + ï..SIZE_50xPOV_mean, data = citi)
+lm4 <- lm(CRIME ~ Ã¯..SIZE_50 + POV_mean + Ã¯..SIZE_50xPOV_mean, data = citi)
 summary(lm4)
 anova(lm4)
 EtaSq(lm4)
