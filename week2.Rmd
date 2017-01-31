@@ -1,0 +1,182 @@
+---
+title: "Week2 Assignment"
+author: "Hyun Joon PARK"
+date: "January 30, 2017"
+output: pdf_document
+---
+
+1.	The Cities data set contains hypothetical data on all cities in the U.S. with population greater than 100,000.  The following variables are included in this data set:
+
+SIZE: 	number of inhabitants (in tens of thousands)
+POV: 	percent of inhabitants living below official poverty line
+UNEMP: 	percent of inhabitants unemployed
+POLICE: 	number of full time police officers (in hundreds)
+CRIME:	number of serious crimes during year (in thousands)
+
+Using these data, your goal is to explore how a city's crime rate (DV) is affected by its size and the poverty of the residents.
+
+
+a.	Start by specifying a multiple regression model in which CRIME is regressed on SIZE and POV.  Test whether the set of both predictors reliably predicts crime and whether each one, controlling for the other, is also reliable. Report the compact and augmented model for each of these tests and interpret parameter estimates but no need for an APA write-up yet. 
+
+Model A: CRIME_i = beta0 + beta1(SIZE) + beta2(POV) + error_i
+Model C: CRIME_i = beta0 + error_i
+H0: beta1 = beta2 = 0
+PA = 3, PC = 1, PA - PC = 2, N- PA = 174 - 3 = 171
+
+
+```{r}
+library(DescTools)
+
+
+setwd('C:/Users/hup11/desktop/Rworking')
+citi <- read.csv('cities_data_set.csv', header= TRUE)
+lm1 <- lm(CRIME ~ ï..SIZE + POV, data = citi)
+summary(lm1)
+anova(lm1)
+EtaSq(lm1)
+
+
+
+```
+
+Set of predictors (number of inhibitants and percentage of inhabitants living below official poverty line) predict crime reliably, *F*(2, 171) = 42.54, *p* < 0.01, PRE = 0.33. When there is no inhibitants in the city and the rate of inhibitant who live in below the poverty line is 0%, -5705 crime incidents are expected. 
+
+
+When controlling for the percentage of inhabitants living below official poverty line, number of inhibitants significantly predicts the crime rate, *F*(1, 171) = 58.22, *p* < 0.01, PRE = 0.16. When the number of inhibitants increase by 10,000 controlling for the percentage of inhabitants living below official poverty line, 1320 incidents of the crime is expected to increase and this relationship is significant, *t*(172) = 6.31, *p* < 0.01, PRE = 0.16.
+ 
+On the other hand controlling for the number of inhibitants, the percentage of inhibitants living below official poverty line predicts crime significantly, *F*(1, 171) = 26.87, *p* < 0.01, PRE = 0.10. One percent of inhitants living below official poverty line increase predicts increase of 3310 crime incidents when the number of inhibitant is controlled and this relationship is significant, *t*(172) = 5.18, *p* < 0.01, PRE = 0.10.  
+
+
+
+
+
+
+b.	Sam the sociologist wonders whether the effect of poverty on crime is magnified in big cities and asks for your help.  To help Sam test this hypothesis you will need to compute a new variable that is the product of POV and SIZE. You will then regress CRIME on POV, SIZE, and their product (again, CRIME is the outcome). Test whether the product (interaction) is reliable.  Report the compact and augmented model for this and provide an interpretation of parameter estimates (i.e., describe what each means, but no need for a formal write-up).
+
+Model A: CRIME_i = beta0 + beta1(SIZE) + beta2(POV) + beta3(SIZE)*(POV) + error_i,    
+Model C: CRIME_i = beta0 + beta1(SIZE) + beta2(POV) + error_i
+
+H0: beta3 = 0, 
+PA= 4, PC = 3, PA - PC = 1, N - PA = 171
+
+```{r}
+ï..SIZExPOV <- citi$POV * citi$ï..SIZE
+lm2 <- lm(CRIME ~ ï..SIZE + POV + ï..SIZExPOV , data = citi )
+anova(lm2)
+summary(lm2)
+EtaSq(lm2)
+
+##note calculating PRE for the overall F test
+#SSE(C) = 299237
+#SSE(A) = 291645
+#SSR = 7592 
+
+```
+
+Overall the model using number of inhabitants, percent of inhabitants living below official poverty line and interaction of previous two variables as predictors significantly predicts the number of crimes, *F*(3, 170) = 30.41, *p* < 0.01, PRE = 0.03.
+
+When the percent of inhabitants living below official poverty line is 0%, 10,000 increase in city's inhabitant predict 946 decrease in the crime rate but this relationship is not significant, *t*(171) = -0.86, *p* = 0.39, PRE = 0.002.
+
+When controlling for the number of inhibitants in the city is 0, 1% increase in city's percentage of inhibitants below poverty line predict 388 decrease in the crime rate but this relationship is not significant, *t*(171) = -0.20, *p* = 0.84, PRE = 0.0001.
+
+When the number of inhibitants in the city increase by 10,000, relationship between the percent of inhabitants living below official poverty line and crime incidents is magnified. In this case, one percent increase in the poverty rate given increase of the city's population by 10,000, additionally predict 95 extra incidents of crime adding on to previously exisitinig relationship and this relationship is significant, *t*(171) = 0.10, *p* = 0.04, PRE = 0.02.
+
+
+c.	Create a plot that shows the relation between city size and crime for low and high levels of poverty (alternatively a plot that shows the relation between poverty and crime for small and large cities).
+
+```{r}
+library(psych)
+describe(citi$ï..SIZE)
+describe(citi$POV)
+
+ï..SIZE_mean <- citi$ï..SIZE - 38.42
+POV_mean <- citi$POV - 22.54
+ï..SIZE_meanXPOV_mean <- ï..SIZE_mean * POV_mean
+
+lm3 <- lm(citi$CRIME ~ ï..SIZE_mean + POV_mean + ï..SIZE_meanXPOV_mean)
+summary(lm3)
+anova(lm3)
+
+### DOing algebraic calculation in R 
+
+#Small city intercept
+#(117.97 + 1.21(-15.58)) = 99.12
+#Small city slope
+#(3.29 + (0.10*(-15.58)) = 1.73
+
+
+#Big city intercept
+#(117.97 + 1.21(15.58)) = 136.82
+#Big city slope
+#(3.29 + (0.10*(15.58)) = 4.85
+
+```
+Plotting in R
+
+
+
+```{r}
+
+citi <- cbind(citi,ï..SIZExPOV, ï..SIZE_mean, POV_mean, ï..SIZE_meanXPOV_mean)
+
+plot(CRIME~POV_mean, data=citi, col="gray", xlab="Poverty Rate", cex.lab=1.5, 
+     ylab="Crime incidents", cex.lab=1.5, cex=.5, xlim=c(-20, 30), ylim=c(0, 260))
+
+par(new=T)
+abline(99.12, 1.73, col="aquamarine2", lwd=3)
+abline(136.82, 4.85, col="purple1", lwd=3)
+legend("bottomright", c("Small city", "Big city"), fill=c("aquamarine2", "purple1"), cex=1)
+
+```
+
+d.	Repeat the analysis you just did in Q1b, but this time mean deviate POV and SIZE before calculating their product. No need to report models A and C. Provide new interpretations of the parameter estimates in this model and verify that the interaction term is unchanged.  You don't need to provide an official write-up here, just interpret the parameter estimates.
+
+I mean deviated for plotting graph in quesiton c. 
+
+
+```{r}
+
+
+lm3 <- lm(citi$CRIME ~ ï..SIZE_mean + POV_mean + ï..SIZE_meanXPOV_mean)
+summary(lm3)
+anova(lm3)
+EtaSq(lm3)
+
+
+```
+
+
+  When the percentage of the inhibitant under the poverty line is on the average level (*M* = 22.54%), 10,000 increase in the inhabitant of the city predicts 1213 increases in the incidents of the crime and this is significant, *t*(171) = 5.70, *p* < 0.01, PRE = 0.12. 
+  
+  When the size is the city is on the average level (*M* = 384200), 1 % increase in the percentage of individuals under the poverty line predicts 3293 increase in the incidents of crime and this relationship is significant, *t*(171) = 5.21, *p* < 0.01, PRE = 0.10.
+
+The analysis shows there is no change in the co-effiecient for the interaction.
+
+
+
+e.	Your friend Sam is particularly interested in the relation between POV and CRIME for cities with a population of 500,000.  To provide an answer, test the simple relation between POV and CRIME in cities where SIZE equals 50 (500,000 inhabitants).  To do this, you will need to deviate SIZE, so that 50 = 0 and then re-compute the product.  To answer the specific question posed here, it doesn't matter if or how poverty is centered (you might try it a couple of ways to see).  No need to report models A and C.  Write a conclusion about the simple relationship between POV and CRIME for cites with half a million residents.
+
+```{r}
+ï..SIZE_50 <- citi$ï..SIZE -50
+citi <- cbind(citi,ï..SIZE_50 )
+ï..SIZE_50xPOV_mean <- ï..SIZE_50 * POV_mean
+citi <- cbind(citi,ï..SIZE_50xPOV_mean)
+
+
+lm4 <- lm(CRIME ~ ï..SIZE_50 + POV_mean + ï..SIZE_50xPOV_mean, data = citi)
+summary(lm4)
+anova(lm4)
+EtaSq(lm4)
+```
+
+For cities that have population of 500,000, 1% increase in the poverty population predicts 4403 increase of crime incidents and this relationship is significant,  *t*(171) = 5.69, *p* < 0.01, PRE = 0.11.
+
+
+f.	Briefly summarize what you learned about the relation between poverty and city size on crime based on these analyses. In particular, focus on how centering the variables affected your interpretation when you included the interaction term.
+
+
+It can be understood that there is a stonger positive relationship between Poverty rate and Crime incidents for big cities than smaller cities. Before centering the variables, the slopes did not represent meaningful values (e.g, How  population of the city predicts the crime rate when the poverty rate is 0%). However after we mean deviated our values, each coefficients have more meaningful values (e.g., How do Population of the city predict the crime rate of the city when the poverty rate is at the mean level).
+
+
+
+
